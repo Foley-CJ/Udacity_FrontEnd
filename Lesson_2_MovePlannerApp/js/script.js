@@ -24,7 +24,7 @@ function loadData() {
     $body.append('<img class="bgimg" src="'+streetViewUrl+'">');
 
     // NYTimes AJAX request
-    $.getJSON("https://api.nytimezs.com/svc/search/v2/articlesearch.json",
+    $.getJSON("https://api.nytimes.com/svc/search/v2/articlesearch.json",
               {'api-key':'4b83002048e84940819ec4761ce6ec80',
                'q':'white house'},
               function (data){
@@ -41,6 +41,36 @@ function loadData() {
     }).error(function() {
          $nytHeaderElem.text('New York Times Articles Could not Be Loaded');
     });
+
+
+
+    // Wikipedia AjAX request
+    var wikiUrl = 'http://en.wikipedia.org/w/api.php?action=opensearch&search=' + cityStr + '&format=json&callback=wikiCallback';
+
+    var wikiRequestTimeout = setTimeout(function(){
+        $wikiElem.text("failed to get wikipedia resources");
+        }, 8000);
+
+
+    $.ajax({
+        url: wikiUrl,
+        dataType: "jsonp",
+        //jsonp: "callbacl",
+        success: function ( response ) {
+            var articleList = response[1];
+
+            $.each(articleList, function(key, val) {
+              var url = 'http://en.wikipedia.org/wiki/'+val;
+              $wikiElem.append('<li><a href="' + url + '">' + val + '</a></li>');
+            });
+
+            clearTimeout(wikiRequestTimeout)
+
+        }
+    });
+
+
+
 
     return false;
 };
